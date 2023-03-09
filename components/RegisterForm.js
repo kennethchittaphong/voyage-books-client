@@ -1,39 +1,78 @@
+/* eslint-disable react/require-default-props */
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import { useRouter } from 'next/router';
 import { registerUser } from '../utils/auth'; // Update with path to registerUser
+import updateUser from '../utils/data/userData';
 
-function RegisterForm({ user, updateUser }) {
-  const [formData, setFormData] = useState({
-    bio: '',
-    uid: user.uid,
-  });
+const initialUserState = {
+  firstName: '',
+  lastName: '',
+  about: '',
+  email: '',
+  profileImageUrl: '',
+};
+function RegisterForm({ user, onUpdate }) {
+  const router = useRouter();
+  const [formData, setFormData] = useState(initialUserState);
+
+  useEffect(() => {
+    if (user.id) {
+      setFormData(user);
+    }
+  }, [user, router]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    registerUser(formData).then(() => updateUser(user.uid));
+    if (user.id) {
+      updateUser(formData, user);
+      router.push(`../../users/${user.id}`);
+    } else {
+      registerUser(user, formData).then(() => onUpdate(user.uid));
+    }
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Form.Group className="mb-3" controlId="formBasicEmail">
-        <Form.Label>Gamer Bio</Form.Label>
-        <Form.Control as="textarea" name="bio" required placeholder="Enter your Bio" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-        <Form.Text className="text-muted">Let other gamers know a little bit about you...</Form.Text>
-      </Form.Group>
-      <Button variant="primary" type="submit">
-        Submit
-      </Button>
-    </Form>
+    <>
+      <h1>{user.id ? 'Edit User Profile' : 'Create User Profile'}</h1>
+      <Form onSubmit={handleSubmit}>
+        <Form.Group className="mb-3" controlId="formBasicEmail">
+
+          <Form.Control name="firstName" placeholder="Enter your first name" required value={formData.firstName} onChange={handleChange} />
+
+          <Form.Control name="lastName" placeholder="Enter your last name" required value={formData.lastName} onChange={handleChange} />
+
+          <Form.Control name="profileImageUrl" placeholder="Add a photo image" required value={formData.profileImageUrl} onChange={handleChange} />
+
+          <Form.Control name="about" as="textarea" placeholder="Share information about yourself" required value={formData.about} onChange={handleChange} />
+
+          <Form.Control name="email" placeholder="Enter your email" required value={formData.email} onChange={handleChange} />
+
+        </Form.Group>
+        <Button variant="primary" type="submit">
+          {user.id ? 'Update' : 'Submit'}
+        </Button>
+      </Form>
+    </>
   );
 }
 
 RegisterForm.propTypes = {
   user: PropTypes.shape({
-    uid: PropTypes.string.isRequired,
+    uid: PropTypes.string,
+    id: PropTypes.number,
   }).isRequired,
-  updateUser: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func,
 };
 
 export default RegisterForm;

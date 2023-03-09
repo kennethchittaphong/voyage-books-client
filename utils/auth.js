@@ -17,10 +17,17 @@ const checkUser = (uid) => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
-const registerUser = (userInfo) => new Promise((resolve, reject) => {
+const registerUser = (userInfo, data) => new Promise((resolve, reject) => {
   fetch(`${clientCredentials.databaseURL}/register`, {
     method: 'POST',
-    body: JSON.stringify(userInfo),
+    body: JSON.stringify({
+      about: data.about,
+      uid: userInfo.uid,
+      first_name: data.firstName,
+      last_name: data.lastName,
+      profile_image_url: data.profileImageUrl,
+      email: data.email,
+    }),
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
@@ -32,11 +39,15 @@ const registerUser = (userInfo) => new Promise((resolve, reject) => {
 
 const signIn = () => {
   const provider = new firebase.auth.GoogleAuthProvider();
-  firebase.auth().signInWithPopup(provider);
+  firebase.auth().signInWithPopup(provider).then((res) => {
+    if (res.user) {
+      localStorage.setItem('user', JSON.stringify(res.user));
+    }
+  }).catch((err) => console.log('sign in error', err));
 };
 
 const signOut = () => {
-  firebase.auth().signOut();
+  firebase.auth().signOut().then(() => localStorage.clear()).catch((err) => console.log('sign out err', err));
 };
 
 export {
