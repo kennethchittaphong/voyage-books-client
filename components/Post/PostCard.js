@@ -1,30 +1,32 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { useRouter } from 'next/router';
+/* eslint-disable @next/next/no-img-element */
 import {
-  Card, CardActionArea, CardMedia, Typography,
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles({
-  root: {
-    maxWidth: 345,
-  },
-});
+  ImageList, ImageListItemBar, ImageListItem, CardActionArea, Container,
+} from '@mui/material';
+import { useRouter } from 'next/router';
+import PropTypes from 'prop-types';
+import React from 'react';
 
 export default function PostCard({ post }) {
   const router = useRouter();
-  const classes = useStyles();
   return (
-    <Card className={classes.root}>
-      <CardActionArea onClick={() => router.push(`../posts/${post.id}`)}>
-        <CardMedia className={classes.media} image={post?.image} title={post.title} />
-        <Typography gutterBottom variant="h5" component="h2">
-          {post.title}
-          {post.location}
-        </Typography>
-      </CardActionArea>
-    </Card>
+    <Container>
+      <ImageList sx={{ width: 700, height: 450 }}>
+        <CardActionArea onClick={() => router.push(`../posts/${post.id}`)}>
+          <ImageListItem key={post.photo_url}>
+            <img
+              src={post.photo_url}
+              alt={post.title}
+              loading="lazy"
+            />
+            <ImageListItemBar
+              title={post.title}
+              subtitle={post.location}
+              position="below"
+            />
+          </ImageListItem>
+        </CardActionArea>
+      </ImageList>
+    </Container>
   );
 }
 
@@ -32,8 +34,7 @@ PostCard.propTypes = {
   post: PropTypes.shape({
     id: PropTypes.string,
     title: PropTypes.string,
-    image: PropTypes.string,
+    photo_url: PropTypes.string,
     location: PropTypes.string,
-
   }).isRequired,
 };

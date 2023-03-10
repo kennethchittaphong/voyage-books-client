@@ -7,38 +7,51 @@ const getAllCommentsByPost = (postId) => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
-const createComment = (comment) => new Promise((resolve, reject) => {
-  fetch('http://localhost:8000/comments', {
+const createComment = (user, comment) => new Promise((resolve, reject) => {
+  console.log('user, comment ===', user, comment);
+  const commentObj = {
+    post: comment.postId,
+    author: user.uid,
+    content: comment.content,
+    created_on: new Date(),
+  };
+  fetch(`${clientCredentials.databaseURL}/comments`, {
     method: 'POST',
-    body: JSON.stringify(comment),
+    body: JSON.stringify(commentObj),
     headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
+      'content-type': 'application/json',
     },
   })
-    .then((resp) => resolve(resp.json()))
+    .then((response) => resolve(response.json()))
+    .catch((error) => reject(error));
+});
+
+const deleteComment = (commentId) => new Promise((resolve, reject) => {
+  fetch(`${clientCredentials.databaseURL}/comments/${commentId}`, {
+    method: 'DELETE',
+  })
+    .then(resolve)
     .catch(reject);
 });
 
-const deleteComment = (id) => fetch(`http://localhost:8000/comments/${id}`, {
-  method: 'DELETE',
-});
-
-const updateComment = (comment) => fetch(`http://localhost:8000/comments/${comment.id}`, {
-  method: 'PUT',
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-  body: JSON.stringify(comment),
-})
-  .then((response) => response.json())
-  .then((data) => {
-    console.warn('Success:', data);
+const updateComment = (user, comment, formInput) => new Promise((resolve, reject) => {
+  const commentObj = {
+    post: comment.post.id,
+    author: comment.author.id,
+    content: formInput.content,
+    user_id: user.uid,
+    created_on: new Date(),
+  };
+  fetch(`${clientCredentials.databaseURL}/comments/${comment.id}`, {
+    method: 'PUT',
+    body: JSON.stringify(commentObj),
+    headers: {
+      'content-type': 'application/json',
+    },
   })
-  .catch((error) => {
-    console.error('Error:', error);
-  });
+    .then(() => resolve())
+    .catch((error) => reject(error));
+});
 
 export {
   getAllCommentsByPost, deleteComment, updateComment, createComment,

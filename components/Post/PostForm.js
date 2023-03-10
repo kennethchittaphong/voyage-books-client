@@ -39,11 +39,12 @@ function PostForm({ obj }) {
     if (formInput.id) {
       const payload = {
         post_id: formInput.postId,
-        title: formInput.name,
+        title: formInput.title,
         location: formInput.location,
-        photo_url: formInput.photo_url,
+        photo_url: formInput.photoUrl,
         content: formInput.content,
         id: formInput.id,
+        creation_date: obj.creationDate,
       };
       updatePost(payload).then(() => router.push('/'));
     } else {
@@ -52,7 +53,7 @@ function PostForm({ obj }) {
         title: formInput.title,
         location: formInput.location,
         content: formInput.content,
-        photo_url: formInput.photo_url,
+        photo_url: formInput.photoUrl,
         uid: user.uid,
       };
       createPost(payload).then(() => {
@@ -69,15 +70,15 @@ function PostForm({ obj }) {
         <Form.Control type="text" placeholder="Enter Title" name="title" value={formInput.title} onChange={handleChange} required />
       </FloatingLabel>
 
-      <FloatingLabel controlId="floatingInput3" label="Location" className="mb-3">
+      <FloatingLabel controlId="floatingInput2" label="Location" className="mb-3">
         <Form.Control type="text" placeholder="Enter Location" name="location" value={formInput.location} onChange={handleChange} required />
       </FloatingLabel>
 
       <FloatingLabel controlId="floatingInput3" label="Upload Photo" className="mb-3">
-        <Form.Control type="text" placeholder="Upload Photo URL" name="photo_url" value={formInput.photo_url} onChange={handleChange} required />
+        <Form.Control type="text" placeholder="Upload Photo URL" name="photoUrl" value={formInput.photoUrl} onChange={handleChange} required />
       </FloatingLabel>
 
-      <FloatingLabel controlId="floatingInput3" label="content" className="mb-3">
+      <FloatingLabel controlId="floatingInput4" label="content" className="mb-3">
         <Form.Control type="text" placeholder="Enter Content" name="content" value={formInput.content} onChange={handleChange} required />
       </FloatingLabel>
 
@@ -93,6 +94,7 @@ PostForm.propTypes = {
     photo_url: PropTypes.string,
     content: PropTypes.string,
     postId: PropTypes.string,
+    creationDate: PropTypes.string,
   }),
 };
 
