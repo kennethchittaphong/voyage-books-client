@@ -8,14 +8,15 @@ import { getSingleUser } from '../../utils/data/userData';
 import { useAuth } from '../../utils/context/authContext';
 
 export default function ViewSingleUser() {
+  // eslint-disable-next-line no-unused-vars
   const { user } = useAuth();
   const [posts, setPosts] = useState();
   const router = useRouter();
   const { userId } = router.query;
+  const [singleUser, setSingleUser] = useState(null);
 
   const getTheUser = () => {
-    getSingleUser(userId).then(() => {
-    });
+    getSingleUser(userId).then(setSingleUser);
     getPostsByUser(userId).then(setPosts);
   };
 
@@ -26,7 +27,7 @@ export default function ViewSingleUser() {
   return (
     <>
       <div>
-        <UserCard userObj={user} />
+        {singleUser && (<UserCard userObj={singleUser} />)}
       </div>
       <hr />
       <div>

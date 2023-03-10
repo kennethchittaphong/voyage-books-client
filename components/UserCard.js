@@ -7,19 +7,25 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Menu from '@mui/material/Menu';
 import {
+  Button,
   CardContent, CardHeader, MenuItem, Typography,
 } from '@mui/material';
 import CardMedia from '@mui/material/CardMedia';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { useAuth } from '../utils/context/authContext';
-import deleteUser from '../utils/data/userData';
+import { deleteUser } from '../utils/data/userData';
 import { signOut } from '../utils/auth';
+import { checkSubscribe, deleteSingleSubscribe, createSubscribe } from '../utils/data/subscriberData';
 
 export default function UserCard({ userObj }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const { user } = useAuth();
+  const [subscribe, setSubscribe] = useState({});
+  const router = useRouter();
+  const { userId } = router.query;
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -34,6 +40,26 @@ export default function UserCard({ userObj }) {
       deleteUser(userObj.id).then(() => {
         signOut();
       });
+    }
+  };
+
+  const checkUsersSubscribes = () => {
+    checkSubscribe(user.id, userId).then((data) => {
+      const subscribeObject = data[0];
+      setSubscribe(subscribeObject);
+    });
+  };
+
+  useEffect(() => {
+    checkUsersSubscribes();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userObj]);
+
+  const handleSubscribeChange = () => {
+    if (subscribe) {
+      deleteSingleSubscribe(subscribe.id).then(checkUsersSubscribes);
+    } else {
+      createSubscribe(user.id, userObj.id).then(checkUsersSubscribes);
     }
   };
 
@@ -89,7 +115,7 @@ export default function UserCard({ userObj }) {
         />
       ) : (
         <CardHeader
-          title={userObj.firstName + ' ' + userObj.lastName}
+          title={userObj?.firstName + ' ' + userObj?.lastName}
         />
       )}
       <CardMedia
@@ -105,6 +131,17 @@ export default function UserCard({ userObj }) {
           {userObj.email}
         </Typography>
       </CardContent>
+      {user.uid !== userObj.uid
+        && (subscribe ? (
+          <Button size="small" color="primary" onClick={() => handleSubscribeChange()}>
+            UnSubscribe
+          </Button>
+        )
+          : (
+            <Button size="small" color="primary" onClick={() => handleSubscribeChange()}>
+              Subscribe
+            </Button>
+          ))}
     </Card>
   );
 }
@@ -117,6 +154,7 @@ UserCard.propTypes = {
     lastName: PropTypes.string,
     email: PropTypes.string,
     about: PropTypes.string,
+    handle: PropTypes.string,
     profileImageUrl: PropTypes.string,
   }).isRequired,
 };

@@ -20,14 +20,16 @@ const createPost = (payload) => new Promise((resolve, reject) => {
 });
 
 const updatePost = (post) => new Promise((resolve, reject) => {
+  console.log('update post ===', post);
   fetch(`${clientCredentials.databaseURL}/posts/${post.id}`, {
     method: 'PUT',
     body: JSON.stringify({
       title: post.title,
-      edited_on: post.editedOn,
-      photo_url: post.imageUrl,
+      edited_on: new Date(),
+      photo_url: post.photo_url,
       content: post.content,
       location: post.location,
+      creation_date: post.creation_date,
     }),
     headers: {
       'content-type': 'application/json',
@@ -43,11 +45,12 @@ const getSinglePost = (postId) => new Promise((resolve, reject) => {
     .then((data) => {
       resolve({
         id: data.id,
-        userId: data.user_id,
+        user: data.user,
         title: data.title,
         creationDate: data.creation_date,
         photoUrl: data.photo_url,
         content: data.content,
+        location: data.location,
         editedOn: data.edited_on,
       });
     })
@@ -78,6 +81,14 @@ const getPostsByUser = (userId) => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
+const deletePost = (postId) => new Promise((resolve, reject) => {
+  fetch(`${clientCredentials.databaseURL}/posts/${postId}`, {
+    method: 'DELETE',
+  })
+    .then(resolve)
+    .catch(reject);
+});
+
 export {
-  createPost, updatePost, getSinglePost, getCustomFeed, getPosts, getPostsByUser,
+  createPost, updatePost, getSinglePost, getCustomFeed, getPosts, getPostsByUser, deletePost,
 };

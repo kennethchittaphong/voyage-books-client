@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useRouter } from 'next/router';
 import { registerUser } from '../utils/auth'; // Update with path to registerUser
-import updateUser from '../utils/data/userData';
+import { updateUser } from '../utils/data/userData';
 
 const initialUserState = {
   firstName: '',
@@ -26,6 +26,7 @@ function RegisterForm({ user, onUpdate }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log('name, value ===', name, value);
     setFormData((prevState) => ({
       ...prevState,
       [name]: value,
@@ -35,7 +36,7 @@ function RegisterForm({ user, onUpdate }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (user.id) {
-      updateUser(formData, user);
+      updateUser(formData, user.id);
       router.push(`../../users/${user.id}`);
     } else {
       registerUser(user, formData).then(() => onUpdate(user.uid));

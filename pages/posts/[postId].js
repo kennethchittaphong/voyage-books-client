@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import CommentForm from '../../components/Comments/CommentForm';
 import CommentCard from '../../components/Comments/CommentCard';
 import { getAllCommentsByPost } from '../../utils/data/commentData';
+import { getSinglePost } from '../../utils/data/postData';
 import PostDetails from '../../components/Post/PostDetails';
 
 export default function ViewSinglePost() {
@@ -18,6 +19,7 @@ export default function ViewSinglePost() {
 
   useEffect(() => {
     getAndSetComments();
+    getSinglePost(postId).then(setPostDetails);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postId]);
 
@@ -27,7 +29,7 @@ export default function ViewSinglePost() {
         <PostDetails postObj={postDetails} />
       </div>
       <div>
-        <CommentForm postId={postDetails.id} getAndSetComments={getAndSetComments} />
+        <CommentForm postId={postId} getAndSetComments={getAndSetComments} />
         {comments?.map((comment) => (
           <CommentCard commentObj={comment} key={comment.id} getAndSetComments={getAndSetComments} />
         ))}
